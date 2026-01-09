@@ -1,0 +1,73 @@
+<div class="modal active">
+    <div class="modal-content modal-lg">
+        <div class="modal-header">
+            <h2 class="modal-title">Budget Analysis</h2>
+            <button class="close-modal" aria-label="Close" (click)="onClose()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <div class="budget-container">
+            <!-- Overview Section -->
+            <div class="budget-overview">
+                <div class="chart-container">
+                    <div class="donut-chart" id="budget-chart" [style.background]="chartBackground">
+                        <div class="chart-center">
+                            <span class="chart-total-label">Total Spent</span>
+                            <span class="chart-total-value">₹{{ totalSpent | number:'1.0-0' }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="salary-input-container">
+                    <label for="salary-input">Monthly Income / Budget</label>
+                    <div class="input-wrapper">
+                        <span class="currency-symbol">₹</span>
+                        <input type="number" id="salary-input" class="salary-input" placeholder="0.00"
+                            [(ngModel)]="salary" name="salary">
+                    </div>
+                    <div class="budget-summary">
+                        <div class="summary-item">
+                            <span>Remaining:</span>
+                            <span [class.positive]="remaining >= 0" [class.negative]="remaining < 0">
+                                ₹{{ remaining | number:'1.2-2' }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="modal-divider">
+
+            <!-- Category Budgets List -->
+            <h3 class="section-title">Category Budgets</h3>
+            <div class="category-budgets-list">
+                <div *ngFor="let stat of categoryStats" class="budget-item">
+                    <div class="budget-item-header">
+                        <div class="budget-category-name">{{ stat.name }}</div>
+                        <div class="budget-input-group">
+                            <span style="font-size: 0.8rem; color: var(--text-muted);">Budget: ₹</span>
+                            <input type="number" class="budget-cat-input" [(ngModel)]="stat.budget" placeholder="0">
+                        </div>
+                    </div>
+                    <div class="budget-stats">
+                        <span>Spent: ₹{{ stat.spent | number:'1.2-2' }}</span>
+                        <span *ngIf="stat.budget > 0">{{ stat.percent | number:'1.0-0' }}%</span>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-bar" [ngClass]="stat.progressClass"
+                            [style.width.%]="stat.percent > 100 ? 100 : stat.percent"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" (click)="onClose()">Close</button>
+                <button type="button" class="btn btn-primary" (click)="onSave()">Save Budget</button>
+            </div>
+        </div>
+    </div>
+</div>

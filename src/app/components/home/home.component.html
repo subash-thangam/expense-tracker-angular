@@ -1,0 +1,174 @@
+<div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header-top">
+            <h1 class="app-title">💰 Expense Tracker</h1>
+
+            <!-- Header Stats -->
+            <div class="header-stats">
+                <div class="stat-card">
+                    <span class="stat-label">Total Spent</span>
+                    <span class="stat-value">₹{{ getTotalExpenses() | number:'1.2-2' }}</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Groups</span>
+                    <span class="stat-value">{{ sortedGroups.length }}</span>
+                </div>
+            </div>
+
+            <div class="menu-container">
+                <button class="menu-btn" (click)="toggleMenu()" aria-label="Menu">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+
+                <div class="menu-dropdown" [class.active]="showMenu">
+                    <button class="menu-item" (click)="openCategoryManager()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                        Manage Categories
+                    </button>
+                    <button class="menu-item" (click)="exportData()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Export Data
+                    </button>
+                    <button class="menu-item" (click)="importData()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        Import Data
+                    </button>
+                </div>
+
+                <!-- Overlay to close menu when clicking outside -->
+                <div *ngIf="showMenu" class="menu-overlay" (click)="closeMenu()"
+                    style="position: fixed; inset: 0; z-index: 99;"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Groups View -->
+    <div class="view-container">
+        <!-- Search Bar with Filters Row -->
+        <div class="group-search-bar">
+            <input 
+                type="text" 
+                placeholder="Search groups..." 
+                [(ngModel)]="groupSearchQuery"
+                (input)="onSearchChange()"
+                class="search-input">
+            <svg *ngIf="groupSearchQuery" (click)="clearSearch()" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="clear-icon">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+
+            <!-- Sort Dropdown -->
+            <div class="filter-dropdown-container">
+                <button class="filter-icon-btn" (click)="toggleSortMenu()" 
+                        [class.active]="showSortMenu"
+                        title="Sort by">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+                <div class="filter-menu" *ngIf="showSortMenu">
+                    <button class="filter-option" [class.active]="groupSortBy === 'name'" (click)="setSortAndCloseMenu('name')">
+                        <span *ngIf="groupSortBy === 'name'" class="checkmark">✓</span>
+                        Sort by Name
+                    </button>
+                    <button class="filter-option" [class.active]="groupSortBy === 'month'" (click)="setSortAndCloseMenu('month')">
+                        <span *ngIf="groupSortBy === 'month'" class="checkmark">✓</span>
+                        Sort by Month/Year
+                    </button>
+                </div>
+            </div>
+
+            <!-- Date Filter Dropdown -->
+            <div class="filter-dropdown-container">
+                <button class="filter-icon-btn" (click)="toggleFilterMenu()" 
+                        [class.active]="showFilterMenu"
+                        title="Filter by date">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                </button>
+                <div class="filter-menu" *ngIf="showFilterMenu">
+                    <button class="filter-option" [class.active]="dateFilter === 'all'" (click)="setDateFilter('all')">
+                        <span *ngIf="dateFilter === 'all'" class="checkmark">✓</span>
+                        All Time
+                    </button>
+                    <button class="filter-option" [class.active]="dateFilter === 'month'" (click)="setDateFilter('month')">
+                        <span *ngIf="dateFilter === 'month'" class="checkmark">✓</span>
+                        This Month
+                    </button>
+                    <button class="filter-option" [class.active]="dateFilter === 'week'" (click)="setDateFilter('week')">
+                        <span *ngIf="dateFilter === 'week'" class="checkmark">✓</span>
+                        This Week
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Overlay to close filter menu -->
+        <div *ngIf="showFilterMenu || showSortMenu" class="filter-overlay" (click)="closeBothMenus()"
+            style="position: fixed; inset: 0; z-index: 99;"></div>
+
+        <main class="groups-container">
+
+            <!-- Loading State -->
+            <div *ngIf="loading" class="loader-spinner" style="margin: 2rem auto;"></div>
+
+            <!-- Groups List -->
+            <div *ngIf="!loading && filteredGroups.length > 0" class="groups-list">
+                <div *ngFor="let group of filteredGroups" class="group-card" (click)="openGroup(group.id)">
+                    <div class="group-card-header">
+                        <div class="group-card-icon">📅</div>
+                        <div class="group-card-info">
+                            <div class="group-card-name">{{ group.name }}</div>
+                            <div class="group-card-meta">
+                                {{ groupEntriesCount[group.id] || 0 }} expense{{ groupEntriesCount[group.id] !== 1 ? 's'
+                                : '' }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="group-card-total">₹{{ group.totalExpenses | number:'1.2-2' }}</div>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div *ngIf="!loading && filteredGroups.length === 0" class="empty-state">
+                <div class="empty-icon">{{ groupSearchQuery ? '🔍' : '📁' }}</div>
+                <div class="empty-text">{{ groupSearchQuery ? 'No matching groups found' : 'No expense groups yet' }}</div>
+                <button class="btn btn-primary" *ngIf="!groupSearchQuery" (click)="openCreateModal()">Create Your First Group</button>
+            </div>
+        </main>
+    </div>
+
+    <!-- FAB -->
+    <button class="fab" (click)="openCreateModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+    </button>
+
+    <!-- Group Modal -->
+    <app-group-modal *ngIf="showGroupModal" (close)="closeCreateModal()" (save)="onGroupCreated()"></app-group-modal>
+
+    <!-- Category Manager -->
+    <app-category-manager *ngIf="showCategoryManager" (close)="closeCategoryManager()"></app-category-manager>
+</div>

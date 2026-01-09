@@ -1,0 +1,160 @@
+/* Header Stats */
+.header-stats {
+  display: flex;
+  gap: 1rem;
+  margin: 0 1rem;
+  
+  .stat-card {
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 0.75rem 1.25rem;
+    border-radius: 8px;
+    min-width: 120px;
+    
+    .stat-label {
+      font-size: 0.75rem;
+      opacity: 0.9;
+      margin-bottom: 0.25rem;
+    }
+    
+    .stat-value {
+      font-size: 1.25rem;
+      font-weight: bold;
+    }
+  }
+}
+
+/* Group Search Bar */
+.group-search-bar {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  background: var(--bg-secondary, #f5f5f5);
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--border-color, #e0e0e0);
+  position: relative;
+  
+  .search-input {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color, #ddd);
+    border-radius: 8px;
+    font-size: 1rem;
+    background: white;
+    
+    &:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+  }
+  
+  .clear-icon {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    color: #999;
+    transition: color 0.2s;
+    
+    &:hover {
+      color: #333;
+    }
+  }
+
+  .filter-dropdown-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 0;
+  }
+}
+
+/* Filter Dropdown */
+.filter-dropdown-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 0;
+
+  .filter-icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--border-color, #ddd);
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 0;
+
+    svg {
+      width: 20px;
+      height: 20px;
+      color: #667eea;
+    }
+
+    &:hover {
+      background: var(--bg-hover, #f0f0f0);
+    }
+
+    &.active {
+      background: #667eea;
+      border-color: #667eea;
+
+      svg {
+        color: white;
+      }
+    }
+  }
+
+  .filter-menu {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    background: white;
+    border: 1px solid var(--border-color, #ddd);
+    border-radius: 8px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    min-width: 160px;
+    overflow: hidden;
+
+    .filter-option {
+      width: 100%;
+      text-align: left;
+      padding: 0.75rem 1rem;
+      border: none;
+      background: white;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: var(--text-secondary, #666);
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      .checkmark {
+        color: #667eea;
+        font-weight: bold;
+        width: 20px;
+      }
+
+      &:hover {
+        background: var(--bg-hover, #f5f5f5);
+      }
+
+      &.active {
+        background: #f0f4ff;
+        color: #667eea;
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+
+

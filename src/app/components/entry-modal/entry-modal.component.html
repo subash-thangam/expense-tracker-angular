@@ -1,0 +1,61 @@
+<div class="modal active">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">{{ isEditing ? 'Edit Expense' : 'Add Expense' }}</h2>
+            <button class="close-modal" aria-label="Close" (click)="onClose()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <form (ngSubmit)="onSubmit()">
+            <div class="form-group">
+                <label class="form-label" for="entry-description">Description *</label>
+                <input type="text" id="entry-description" class="form-input" placeholder="What did you spend on?"
+                    [(ngModel)]="description" name="description" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="entry-amount">Amount *</label>
+                <div class="input-icon-wrapper">
+                    <span class="currency-symbol">₹</span>
+                    <input type="number" id="entry-amount" class="form-input" placeholder="0.00" [(ngModel)]="amount"
+                        name="amount" required step="0.01" min="0">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="entry-category">Category</label>
+                <div class="select-wrapper">
+                    <select id="entry-category" class="form-select" [(ngModel)]="category" name="category">
+                        <option value="">Select category...</option>
+                        <option *ngFor="let cat of categories" [value]="cat.name">{{ cat.name }}</option>
+                    </select>
+                    <button type="button" class="btn-icon-small" (click)="openCategoryModal()" title="Add Category">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="entry-date">Date *</label>
+                <input type="date" id="entry-date" class="form-input" [(ngModel)]="date" name="date" required>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" (click)="onClose()">Cancel</button>
+                <button type="submit" class="btn btn-primary" [disabled]="!description || !amount">
+                    {{ isEditing ? 'Update' : 'Add' }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<app-category-modal *ngIf="showCategoryModal" (close)="closeCategoryModal()"
+    (save)="onCategoryAdded()"></app-category-modal>
