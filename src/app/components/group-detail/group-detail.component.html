@@ -1,0 +1,128 @@
+<div class="app-container">
+    <div class="view-container">
+        <!-- Header (Custom for Details View) -->
+        <header class="app-header">
+            <div class="header-top">
+                <button class="back-btn" (click)="goBack()" style="display: flex;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                </button>
+
+                <!-- Parent Info -->
+                <div class="parent-info" *ngIf="group">
+                    <div class="parent-name">{{ group.name }}</div>
+                    <div class="parent-info-right">
+                        <button class="icon-btn" (click)="openBudgetModal()" aria-label="Analysis">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
+                                <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
+                            </svg>
+                        </button>
+                        <div class="total-amount">₹{{ group.totalExpenses | number:'1.2-2' }}</div>
+                    </div>
+                </div>
+
+                <!-- Menu Button (Reuse or simplified) -->
+                <button class="menu-btn" (click)="confirmDeleteGroup()" aria-label="Delete Group"
+                    style="margin-left: auto;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <main class="entries-container">
+            <div *ngIf="loading" class="loader-spinner" style="margin: 2rem auto;"></div>
+
+            <div *ngIf="!loading && entries.length > 0" class="entries-list">
+                <div *ngFor="let entry of entries" class="entry-card">
+                    <div class="entry-main" (click)="openEntryModal(entry.id)">
+                        <div class="entry-info">
+                            <div class="entry-description">{{ entry.description }}</div>
+                            <div class="entry-meta">
+                                <span class="entry-date">{{ entry.date | date:'dd MMM yyyy' }}</span>
+                                <span *ngIf="entry.category" class="entry-category">{{ entry.category }}</span>
+                            </div>
+                        </div>
+                        <div class="entry-amount">₹{{ entry.amount | number:'1.2-2' }}</div>
+                    </div>
+
+                    <div class="entry-actions">
+                        <button class="action-btn duplicate-btn" (click)="duplicateEntry(entry, $event)">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
+                        </button>
+                        <button class="action-btn delete-btn" (click)="confirmDeleteEntry(entry.id, $event)">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path
+                                    d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                </path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div *ngIf="!loading && entries.length === 0" class="empty-state">
+                <div class="empty-icon">📝</div>
+                <div class="empty-text">No expenses in this group yet</div>
+            </div>
+        </main>
+    </div>
+
+    <!-- FAB -->
+    <button class="fab" (click)="openEntryModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+    </button>
+
+    <!-- Scanner FAB -->
+    <button class="fab fab-secondary" (click)="openScan()" title="Scan UPI QR">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+        </svg>
+    </button>
+
+    <!-- Modals -->
+    <app-entry-modal *ngIf="showEntryModal" [entryId]="selectedEntryId" [groupId]="groupId" (close)="closeEntryModal()"
+        (save)="onEntrySaved()"></app-entry-modal>
+
+    <app-budget-modal *ngIf="showBudgetModal" [groupId]="groupId" (close)="closeBudgetModal()"></app-budget-modal>
+
+    <!-- Simple Delete Modal (Inline or separate component) -->
+    <div class="modal active" *ngIf="showDeleteEntryModal">
+        <div class="modal-content">
+            <h2 class="modal-title">Delete Expense?</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Are you sure?</p>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" (click)="cancelDeleteEntry()">Cancel</button>
+                <button class="btn btn-danger" (click)="onDeleteEntryConfirmed()">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal active" *ngIf="showDeleteGroupModal">
+        <div class="modal-content">
+            <h2 class="modal-title">Delete Group?</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Delete this group and all expenses?</p>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" (click)="cancelDeleteGroup()">Cancel</button>
+                <button class="btn btn-danger" (click)="onDeleteGroup()">Delete Group</button>
+            </div>
+        </div>
+    </div>
+
+</div>
